@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 """This module defines the command interpreter for the HBNB console."""
 
 import cmd
