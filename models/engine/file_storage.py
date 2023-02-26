@@ -1,39 +1,41 @@
 #!/usr/bin/python3
-"""FileStorage is responsible for managing the serialization/deserialization
-of BaseModel instances to/from a JSON file
 """
-
+Filestorage funtion all, new, save, reload
+"""
 import json
 import os.path
+from models.base_model import BaseModel
+from models.user import User
 
 
-class FileStorage:
-    __file_path = 'file.json'
+class FileStorage():
+    """ Init"""
+    __file_path = "file.json"
     __objects = {}
 
     def all(self):
-        """Returns the dictionary __objects"""
-        return self.__objects
+        """ Returns dict """
+        return type(self).__objects
 
     def new(self, obj):
-        """Sets in __objects the obj with key <obj class name>.id"""
-        key = obj.__class__.__name__ + '.' + obj.id
-        self.__objects[key] = obj
+        """ Sets new object in dictionary """
+        if obj:
+            self.__objects["{}.{}".format(
+                obj.__class__.__name__, obj.id)] = obj
 
     def save(self):
-        """Serializes __objects to the JSON file (path: __file_path)"""
-        objects_dict = {}
-        for key, value in self.__objects.items():
-            objects_dict[key] = value.to_dict()
-        with open(self.__file_path, mode='w', encoding='utf-8') as f:
-            json.dump(objects_dict, f)
+        """ Serializes __objects = {}"""
+        new_jhoson_file = {}
+        with open(self.__file_path, mode="w") as jfile:
+            for key, value in self.__objects.items():
+                new_jhoson_file[key] = value.to_dict()
+                """JSON encoder and decoder"""
+            json.dump(new_jhoson_file, jfile)
 
     def reload(self):
-        """Deserializes the JSON file to __objects"""
-        if os.path.exists(self.__file_path):
-            with open(self.__file_path, mode='r', encoding='utf-8') as f:
-                objects_dict = json.load(f)
-            for key, value in objects_dict.items():
-                class_name, obj_id = key.split('.')
-                value['__class__'] = class_name
-                self.__objects[key] = eval(class_name)(**value)
+        """ Deserializes __objects = {}"""
+        if os.path.isfile(self.__file_path):
+            with open(self.__file_path, mode="r") as jfile:
+                for key, value in json.load(jfile).items():
+                    new_obj = eval(value["__class__"])(**value)
+                    self.__objects[key] = new_obj
