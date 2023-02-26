@@ -1,8 +1,10 @@
 #!/usr/bin/python3
-"""class file sortage"""
+"""FileStorage is responsible for managing the serialization/deserialization
+of BaseModel instances to/from a JSON file
+"""
 
 import json
-from models.base_model import BaseModel
+import os.path
 
 
 class FileStorage:
@@ -10,25 +12,28 @@ class FileStorage:
     __objects = {}
 
     def all(self):
-        return FileStorage.__objects
+        """Returns the dictionary __objects"""
+        return self.__objects
 
     def new(self, obj):
-        key = "{}.{}".format(obj.__class__.__name__, obj.id)
-        FileStorage.__objects[key] = obj
+        """Sets in __objects the obj with key <obj class name>.id"""
+        key = obj.__class__.__name__ + '.' + obj.id
+        self.__objects[key] = obj
 
     def save(self):
-        dictionary = {}
-        for key, value in FileStorage.__objects.items():
-            dictionary[key] = value.to_dict()
-        with open(FileStorage.__file_path, mode='w', encoding='utf-8') as f:
-            json.dump(dictionary, f)
+        """Serializes __objects to the JSON file (path: __file_path)"""
+        objects_dict = {}
+        for key, value in self.__objects.items():
+            objects_dict[key] = value.to_dict()
+        with open(self.__file_path, mode='w', encoding='utf-8') as f:
+            json.dump(objects_dict, f)
 
     def reload(self):
-        try:
-            with open(FileStorage.__file_path, mode='r', encoding='utf-8') as f:
-                dictionary = json.load(f)
-            for key, value in dictionary.items():
-                obj = eval(value['__class__'])(**value)
-                self.new(obj)
-        except:
-            pass
+        """Deserializes the JSON file to __objects"""
+        if os.path.exists(self.__file_path):
+            with open(self.__file_path, mode='r', encoding='utf-8') as f:
+                objects_dict = json.load(f)
+            for key, value in objects_dict.items():
+                class_name, obj_id = key.split('.')
+                value['__class__'] = class_name
+                self.__objects[key] = eval(class_name)(**value)
