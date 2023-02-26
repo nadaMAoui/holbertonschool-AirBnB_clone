@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+"""class file sortage"""
+
 import json
 from models.base_model import BaseModel
 
