@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+This module defines the HBNBCommand class, a command interpreter.
+"""
+
 import cmd
 
 class HBNBCommand(cmd.Cmd):
