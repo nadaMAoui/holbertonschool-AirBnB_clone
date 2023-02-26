@@ -1,53 +1,36 @@
-#!/user/bin/python3
-"""
-Class Base
-"""
-
-import models
 import uuid
 from datetime import datetime
 
-
 class BaseModel:
-    """Base class"""
-
+    """
+    Defines common attributes/methods for other classes.
+    """
     def __init__(self, *args, **kwargs):
-        """Class constructor"""
-
-        if not kwargs:
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = self.created_at
-            models.storage.new(self)
-
-        else:
-            self.__dict__ = kwargs
-            self.created_at = datetime.strptime(self.created_at,
-                                                "%Y-%m-%dT%H:%M:%S.%f")
-            self.updated_at = datetime.strptime(self.updated_at,
-                                                "%Y-%m-%dT%H:%M:%S.%f")
+        """
+        Initializes the instance with a unique id and the creation date.
+        """
+        self.id = str(uuid.uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
 
     def __str__(self):
-        """Object string representation"""
-        return "[{}] ({}) {}".format(
-            type(self).__name__, self.id, self.__dict__)
+        """
+        Returns a string representation of the instance.
+        """
+        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
 
     def save(self):
         """
-        Update with self.updated and time.
+        Updates the public instance attribute updated_at with the current datetime.
         """
         self.updated_at = datetime.now()
-        models.storage.save()
 
     def to_dict(self):
         """
-        Return __dict__ value, key.
-        Convert Str to iso format.
-        serialization and deserialization.
+        Returns a dictionary containing all keys/values of __dict__ of the instance.
         """
-
         dict_copy = self.__dict__.copy()
-        dict_copy["__class__"] = self.__class__.__name__
-        dict_copy["created_at"] = self.created_at.isoformat()
-        dict_copy["updated_at"] = self.updated_at.isoformat()
+        dict_copy['__class__'] = self.__class__.__name__
+        dict_copy['created_at'] = self.created_at.isoformat()
+        dict_copy['updated_at'] = self.updated_at.isoformat()
         return dict_copy
